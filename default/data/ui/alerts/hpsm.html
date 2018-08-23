@@ -4,7 +4,7 @@
 
         <div class="controls">
             <input type="text" name="action.hpsm.param.title" id="hpsm_title" />
-            <span class="help-block">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
                 The HPSM incident title
                 Include tokens to insert text based on search results.
                 <a href="{{SPLUNKWEB_URL_PREFIX}}/help?location=learnmore.alert.action.tokens" target="_blank"
@@ -17,7 +17,7 @@
 
         <div class="controls">
             <textarea name="action.hpsm.param.description" id="hpsm_description"></textarea>
-            <span class="help-block">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
                 The HPSM incident description
                 Include tokens to insert text based on search results.
                 <a href="{{SPLUNKWEB_URL_PREFIX}}/help?location=learnmore.alert.action.tokens" target="_blank"
@@ -30,7 +30,9 @@
 
         <div class="controls">
             <input type="text" name="action.hpsm.param.category" id="hpsm_category" placeholder="Optional"/>
-            <span class="help-block">Override the globally configured HPSM incident category for this alert. Default: incident</span>
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Override the globally configured HPSM incident category for this alert. Default: incident
+            </span>
         </div>
     </div>
     <div class="control-group">
@@ -38,7 +40,9 @@
 
         <div class="controls">
             <input type="text" name="action.hpsm.param.from" id="hpsm_from" placeholder="Optional"/>
-            <span class="help-block">Override the globally configured Splunk service name for this alert. Default: splunk</span>
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Override the globally configured Splunk service name for this alert. Default: splunk
+            </span>
         </div>
     </div>
     <div class="control-group">
@@ -46,7 +50,9 @@
 
         <div class="controls">
             <input type="text" name="action.hpsm.param.login" id="hpsm_login" placeholder="Optional"/>
-            <span class="help-block">Override the globally configured HPSM login for this alert.</span>
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Override the globally configured HPSM login for this alert.
+            </span>
         </div>
     </div>
     <div class="control-group">
@@ -54,7 +60,9 @@
 
         <div class="controls">
             <input type="password" name="action.hpsm.param.password" id="hpsm_password" placeholder="Optional"/>
-            <span class="help-block">Override the globally configured HPSM password for this alert.</span>
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Override the globally configured HPSM password for this alert.
+            </span>
         </div>
     </div>
 </form>
