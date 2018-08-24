@@ -6,7 +6,7 @@ import urllib2
 
 def send_message(settings):
     print >> sys.stderr, "DEBUG Sending message with settings %s" % settings
-    login_value = settings("login")
+    login_value = settings.get("login")
     password_value = settings.get("password")
     base_url_value = settings.get("url").rstrip('/')
     title_value = settings.get("title")
