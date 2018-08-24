@@ -26,7 +26,7 @@ def send_message(settings):
         print >> sys.stderr, "DEBUG HPSM server response: %s" % json.dumps(body)
         return 200 <= res.code < 300
     except urllib2.HTTPError, e:
-        print >> sys.stderr, "ERROR Error sending message: %s" % e
+        print >> sys.stderr, "ERROR Error sending HPSM incident: %s" % e
         return False
 
 
@@ -34,10 +34,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--execute":
         payload = json.loads(sys.stdin.read())
         if not send_message(payload.get('configuration')):
-            print >> sys.stderr, "FATAL Failed trying to send room notification"
+            print >> sys.stderr, "FATAL Failed trying to send HPSM incident"
             sys.exit(2)
         else:
-            print >> sys.stderr, "INFO Room notification successfully sent"
+            print >> sys.stderr, "INFO HPSM incident successfully sent"
     else:
         print >> sys.stderr, "FATAL Unsupported execution mode (expected --execute flag)"
         sys.exit(1)
