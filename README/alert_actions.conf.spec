@@ -35,3 +35,6 @@ param.contactName = <string>
 
 param.assignment = <string>
 * HPSM incident assignment (default: SPLUNK)
+
+param.incidentId = <int>
+* The incident internal splunk ID, for example: Alert Manager incident_id (default: -1 -- will be ignored)
