@@ -55,7 +55,7 @@ def send_message(settings, session_key):
     callback_contact_value = settings.get("callbackContact", "splunk")
     contact_name_value = settings.get("contactName", "splunk")
     assignment_value = settings.get("assignment", "SPLUNK")
-    incident_id_value = settings.get("incidentId", -1)
+    incident_id_value = settings.get("incidentId", "Unknown")
 
     body = json.dumps(
         {
@@ -85,7 +85,7 @@ def send_message(settings, session_key):
         print >> sys.stderr, "INFO HPSM server responded with HTTP status=%d" % res.code
         print >> sys.stderr, "DEBUG HPSM server response: %s" % json.dumps(body)
 
-        if 200 <= res.code < 300 and incident_id_value != -1:
+        if 200 <= res.code < 300 and incident_id_value != "Unknown":
             json_body = json.loads(body)
             incident_data = json_body.get("tlmrSplunkMon")
             external_id = incident_data.get("number", "")
