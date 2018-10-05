@@ -45,24 +45,32 @@ def get_incident_key(incident_id, session_key):
 def set_incident_external_reference_id(external_key, incident_key, session_key):
     uri = '/servicesNS/nobody/alert_manager/storage/collections/data/incidents/%s' % incident_key
     incident = get_rest_data(uri, session_key)
+    debug("Incident BEFORE = %s" % json.dumps(incident))
     incident['external_reference_id'] = external_key
+    debug("Incident AFTER = %s" % json.dumps(incident))
     get_rest_data(uri, session_key, json.dumps(incident))
 
 
-def get_rest_data(uri, session_key, data=None):
+def get_rest_data(uri, session_key, data=None, output_mode='json'):
     try:
         if data is None:
-            server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key)
+            if output_mode == 'default':
+                server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key)
+            else:
+                server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key,
+                                                                     getargs={'output_mode': 'json'})
         else:
-            server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key, jsonargs=data)
-    except Exception as e:
-        error(e)
+            if output_mode == 'default':
+                server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key, jsonargs=data)
+            else:
+                server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key, jsonargs=data,
+                                                                     getargs={'output_mode': 'json'})
+    except:
         server_content = None
 
     try:
         return_data = json.loads(server_content)
-    except Exception as e:
-        error(e)
+    except:
         return_data = []
 
     return return_data
@@ -158,6 +166,7 @@ def send_message(settings, session_key):
 
             if external_id != "":
                 incident_key = get_incident_key(incident_id_value, session_key)
+                debug('Incident key = %s' % incident_key)
                 set_incident_external_reference_id(external_id, incident_key, session_key)
 
         return 200 <= res.code < 300
