@@ -37,14 +37,14 @@ def error(message):
 def get_incident_key(incident_id, session_key):
     query = '{"incident_id": "%s"}' % incident_id
     uri = '/servicesNS/nobody/alert_manager/storage/collections/data/incidents?query=%s' % urllib.quote(query)
-    incident = get_rest_data(uri, session_key)
+    incident = get_rest_data(uri, session_key, output_mode='default')
     incident_key = incident[0]["_key"]
     return incident_key
 
 
 def set_incident_external_reference_id(external_key, incident_key, session_key):
     uri = '/servicesNS/nobody/alert_manager/storage/collections/data/incidents/%s' % incident_key
-    incident = get_rest_data(uri, session_key)
+    incident = get_rest_data(uri, session_key, output_mode='default')
     debug("Incident BEFORE = %s" % json.dumps(incident))
     incident['external_reference_id'] = external_key
     debug("Incident AFTER = %s" % json.dumps(incident))
