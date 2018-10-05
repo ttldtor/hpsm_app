@@ -66,7 +66,10 @@ def get_rest_data(uri, session_key, data=None, output_mode='json'):
                 server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key, jsonargs=data,
                                                                      getargs={'output_mode': 'json'})
     except:
+        server_response = None
         server_content = None
+
+    debug("Server response = %s, Server content = %s" % (server_response, server_content))
 
     try:
         return_data = json.loads(server_content)
@@ -74,6 +77,26 @@ def get_rest_data(uri, session_key, data=None, output_mode='json'):
         return_data = []
 
     return return_data
+
+
+def set_incident_comment(incident_id, external_key, session_key):
+    uri = "/services/alert_manager/helpers"
+    post_args = '{"action": "write_log_entry", "log_action": "comment", "origin": "externalworkflowaction", "incident_id": "%s", "comment": "Updated external_reference_id=%s"}' % (
+        incident_id, external_key)
+
+    try:
+        server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key,
+                                                             postargs=json.loads(post_args),
+                                                             method='POST')
+
+    except Exception, e:
+        print >> sys.stderr, "ERROR Unexpected error: %s" % e
+        error("Unexpected error: %s" % e)
+        server_response = None
+        server_content = None
+
+    debug("Server response = %s, Server content = %s" % (server_response, server_content))
+    return
 
 
 def send_message(settings, session_key):
@@ -168,6 +191,7 @@ def send_message(settings, session_key):
                 incident_key = get_incident_key(incident_id_value, session_key)
                 debug('Incident key = %s' % incident_key)
                 set_incident_external_reference_id(external_id, incident_key, session_key)
+                set_incident_comment(incident_id_value, external_id, session_key)
 
         return 200 <= res.code < 300
     except urllib2.HTTPError, e:
