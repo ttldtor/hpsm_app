@@ -79,13 +79,44 @@ def send_message(settings, session_key):
     category_value = settings.get("category", "incidents")
     subcategory_value = settings.get("subcategory", "Другое")
     product_type_value = settings.get("productType", "Другое")
+
+    # WORKAROUND: splunk `sendalert` converts parameter names to low case
+    product_type2_value = settings.get("producttype", "#####")
+    if product_type2_value != "#####":
+        product_type_value = product_type2_value
+
     from_value = settings.get("from", "splunk")
     affected_item_value = settings.get("affectedItem", "CI1127974")
+
+    # WORKAROUND: splunk `sendalert` converts parameter names to low case
+    affected_item2_value = settings.get("affecteditem", "#####")
+    if affected_item2_value != "#####":
+        affected_item_value = affected_item2_value
+
     location_value = settings.get("location", "5a12997da100a05f506e1e38")
     callback_contact_value = settings.get("callbackContact", "splunk")
+
+    # WORKAROUND: splunk `sendalert` converts parameter names to low case
+    callback_contact2_value = settings.get("callbackcontact", "#####")
+    if callback_contact2_value != "#####":
+        callback_contact_value = callback_contact2_value
+
     contact_name_value = settings.get("contactName", "splunk")
+
+    # WORKAROUND: splunk `sendalert` converts parameter names to low case
+    contact_name2_value = settings.get("contactname", "#####")
+    if contact_name2_value != "#####":
+        contact_name_value = contact_name2_value
+
     assignment_value = settings.get("assignment", "SPLUNK")
     incident_id_value = settings.get("incidentId", "Unknown")
+
+    # WORKAROUND: splunk `sendalert` converts parameter names to low case
+    incident_id2_value = settings.get("incidentid", "#####")
+    if incident_id2_value != "#####":
+        incident_id_value = incident_id2_value
+
+    debug('Incident ID = %s' % incident_id_value)
 
     body = json.dumps(
         {
@@ -118,10 +149,12 @@ def send_message(settings, session_key):
         print >> sys.stderr, "DEBUG HPSM server response: %s" % json.dumps(body)
         debug('HPSM server response: %s' % json.dumps(body))
 
-        if 200 <= res.code < 300 and incident_id_value != "Unknown":
-            json_body = json.loads(body)
-            incident_data = json_body.get("tlmrSplunkMon")
-            external_id = incident_data.get("number", "")
+        json_body = json.loads(body)
+        incident_data = json_body.get("tlmrSplunkMon")
+        debug('Incident data = %s' % json.dumps(incident_data))
+        external_id = incident_data.get("number", "")
+        debug('External ID = %s' % json.dumps(external_id))
+        if (200 <= res.code < 300) and (incident_id_value != "Unknown"):
 
             if external_id != "":
                 incident_key = get_incident_key(incident_id_value, session_key)
