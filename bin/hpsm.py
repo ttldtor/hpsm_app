@@ -6,10 +6,32 @@ import urllib2
 import urllib
 import splunk.rest as rest
 import tempfile
-import logging
 import os.path
+from datetime import datetime
 
-logging.basicConfig(filename=os.path.join(tempfile.gettempdir(), 'hpsmapp.log'), level=logging.DEBUG)
+
+def now_str():
+    return datetime.now().isoformat(' ')
+
+
+log_format = "%s %s| %s"
+
+
+def log(level, message):
+    with open(os.path.join(tempfile.gettempdir(), 'hpsmapp.log'), 'a') as f:
+        print >> f, log_format % (now_str(), level, message)
+
+
+def debug(message):
+    log("DEBUG", message)
+
+
+def info(message):
+    log("INFO", message)
+
+
+def error(message):
+    log("ERROR", message)
 
 
 def get_incident_key(incident_id, session_key):
@@ -33,20 +55,22 @@ def get_rest_data(uri, session_key, data=None):
             server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key)
         else:
             server_response, server_content = rest.simpleRequest(uri, sessionKey=session_key, jsonargs=data)
-    except:
+    except Exception as e:
+        error(e)
         server_content = None
 
     try:
         return_data = json.loads(server_content)
-    except:
+    except Exception as e:
+        error(e)
         return_data = []
 
     return return_data
 
 
 def send_message(settings, session_key):
-    print >> sys.stderr, "DEBUG Sending message with settings %s, session_key = %s" % settings, session_key
-    logging.debug("Sending message with settings %s, session_key = %s", settings, session_key)
+    print >> sys.stderr, "DEBUG Sending message with settings %s, session_key = %s" % (settings, session_key)
+    debug("Sending message with settings %s, session_key = %s" % (settings, session_key))
     login_value = settings.get("login")
     password_value = settings.get("password")
     base_url_value = settings.get("url").rstrip('/')
@@ -82,7 +106,7 @@ def send_message(settings, session_key):
     )
 
     print >> sys.stderr, 'DEBUG Calling url="%s" with body=%s' % (base_url_value, body)
-    logging.debug('Calling url="%s" with body=%s', base_url_value, body)
+    debug('Calling url="%s" with body=%s' % (base_url_value, body))
     request = urllib2.Request(base_url_value, body, {"Content-Type": "application/json"})
     request.add_header("Authorization",
                        "Basic %s" % base64.encodestring('%s:%s' % (login_value, password_value)).replace('\n', ''))
@@ -90,9 +114,9 @@ def send_message(settings, session_key):
         res = urllib2.urlopen(request)
         body = res.read()
         print >> sys.stderr, "INFO HPSM server responded with HTTP status=%d" % res.code
-        logging.info('HPSM server responded with HTTP status=%d', res.code)
+        info('HPSM server responded with HTTP status=%d' % res.code)
         print >> sys.stderr, "DEBUG HPSM server response: %s" % json.dumps(body)
-        logging.debug('DEBUG HPSM server response: %s', json.dumps(body))
+        debug('HPSM server response: %s' % json.dumps(body))
 
         if 200 <= res.code < 300 and incident_id_value != "Unknown":
             json_body = json.loads(body)
@@ -106,6 +130,7 @@ def send_message(settings, session_key):
         return 200 <= res.code < 300
     except urllib2.HTTPError, e:
         print >> sys.stderr, "ERROR Error sending HPSM incident: %s" % e
+        error("ERROR Error sending HPSM incident: %s" % e)
         return False
 
 
@@ -114,12 +139,12 @@ if __name__ == "__main__":
         payload = json.loads(sys.stdin.read())
         if not send_message(payload.get('configuration'), payload.get('session_key')):
             print >> sys.stderr, "FATAL Failed trying to send HPSM incident"
-            logging.error('Failed trying to send HPSM incident')
+            error('Failed trying to send HPSM incident')
             sys.exit(2)
         else:
             print >> sys.stderr, "INFO HPSM incident successfully sent"
-            logging.info('HPSM incident successfully sent')
+            info('HPSM incident successfully sent')
     else:
         print >> sys.stderr, "FATAL Unsupported execution mode (expected --execute flag)"
-        logging.error('FATAL Unsupported execution mode (expected --execute flag)')
+        error('FATAL Unsupported execution mode (expected --execute flag)')
         sys.exit(1)
